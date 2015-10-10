@@ -196,7 +196,8 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 	}
 
 	// Determine caller func
-	pc, _, lineno, ok := runtime.Caller(2)
+	// modify by shiwei: 修改层级为3以适应yzlog
+	pc, _, lineno, ok := runtime.Caller(3)
 	src := ""
 	if ok {
 		src = fmt.Sprintf("%s:%d", runtime.FuncForPC(pc).Name(), lineno)
