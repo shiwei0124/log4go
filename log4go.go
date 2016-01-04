@@ -78,6 +78,10 @@ const (
 	CRITICAL
 )
 
+const (
+	DEFAULT_SKIP_LEVEL = 3
+)
+
 // Logging level strings
 var (
 	levelStrings = [...]string{"FNST", "FINE", "DEBG", "TRAC", "INFO", "WARN", "EROR", "CRIT"}
@@ -126,6 +130,7 @@ type LogWriter interface {
 type Filter struct {
 	Level Level
 	LogWriter
+	SkipLevel int
 }
 
 // A Logger represents a collection of Filters through which log messages are
@@ -147,15 +152,15 @@ func NewLogger() Logger {
 func NewConsoleLogger(lvl Level) Logger {
 	os.Stderr.WriteString("warning: use of deprecated NewConsoleLogger\n")
 	return Logger{
-		"stdout": &Filter{lvl, NewConsoleLogWriter()},
+		"stdout": &Filter{lvl, NewConsoleLogWriter(), DEFAULT_SKIP_LEVEL},
 	}
 }
 
 // Create a new logger with a "stdout" filter configured to send log messages at
 // or above lvl to standard output.
-func NewDefaultLogger(lvl Level) Logger {
+func NewDefaultLogger(lvl Level, skipLevel int) Logger {
 	return Logger{
-		"stdout": &Filter{lvl, NewConsoleLogWriter()},
+		"stdout": &Filter{lvl, NewConsoleLogWriter(),skipLevel + DEFAULT_SKIP_LEVEL},
 	}
 }
 
@@ -175,7 +180,7 @@ func (log Logger) Close() {
 // higher.  This function should not be called from multiple goroutines.
 // Returns the logger for chaining.
 func (log Logger) AddFilter(name string, lvl Level, writer LogWriter) Logger {
-	log[name] = &Filter{lvl, writer}
+	log[name] = &Filter{lvl, writer, DEFAULT_SKIP_LEVEL}
 	return log
 }
 
@@ -183,9 +188,12 @@ func (log Logger) AddFilter(name string, lvl Level, writer LogWriter) Logger {
 // Send a formatted log message internally
 func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 	skip := true
-
+	skipLevel := DEFAULT_SKIP_LEVEL 
 	// Determine if any logging will be done
 	for _, filt := range log {
+		if skipLevel <= filt.SkipLevel {
+			skipLevel = filt.SkipLevel
+		}
 		if lvl >= filt.Level {
 			skip = false
 			break
@@ -197,7 +205,7 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 
 	// Determine caller func
 	// modify by shiwei: 修改层级为3以适应yzlog
-	pc, _, lineno, ok := runtime.Caller(3)
+	pc, _, lineno, ok := runtime.Caller(skipLevel)
 	src := ""
 	if ok {
 		src = fmt.Sprintf("%s:%d", runtime.FuncForPC(pc).Name(), lineno)
@@ -228,9 +236,13 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 // Send a closure log message internally
 func (log Logger) intLogc(lvl Level, closure func() string) {
 	skip := true
+	skipLevel := DEFAULT_SKIP_LEVEL 
 
 	// Determine if any logging will be done
 	for _, filt := range log {
+		if skipLevel <= filt.SkipLevel {
+			skipLevel = filt.SkipLevel
+		}
 		if lvl >= filt.Level {
 			skip = false
 			break
@@ -241,7 +253,7 @@ func (log Logger) intLogc(lvl Level, closure func() string) {
 	}
 
 	// Determine caller func
-	pc, _, lineno, ok := runtime.Caller(2)
+	pc, _, lineno, ok := runtime.Caller(skipLevel)
 	src := ""
 	if ok {
 		src = fmt.Sprintf("%s:%d", runtime.FuncForPC(pc).Name(), lineno)
