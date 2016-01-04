@@ -79,7 +79,7 @@ const (
 )
 
 const (
-	DEFAULT_SKIP_LEVEL = 3
+	DEFAULT_SKIP_LEVEL = 2
 )
 
 // Logging level strings
