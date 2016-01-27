@@ -205,6 +205,7 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 
 	// Determine caller func
 	// modify by shiwei: 修改层级为3以适应yzlog
+	fmt.Printf("!!!!!!!!!!!!!!!%d", skipLevel)
 	pc, _, lineno, ok := runtime.Caller(skipLevel)
 	src := ""
 	if ok {
@@ -253,6 +254,7 @@ func (log Logger) intLogc(lvl Level, closure func() string) {
 	}
 
 	// Determine caller func
+	fmt.Printf("!!!!!!!!!!!!!!!%d", skipLevel)
 	pc, _, lineno, ok := runtime.Caller(skipLevel)
 	src := ""
 	if ok {
