@@ -23,8 +23,8 @@ func LoadConfiguration(filename string) {
 }
 
 // Wrapper for (*Logger).AddFilter
-func AddFilter(name string, lvl Level, writer LogWriter) {
-	Global.AddFilter(name, lvl, writer)
+func AddFilter(name string, lvl Level, writer LogWriter, skipLevel int) {
+	Global.AddFilter(name, lvl, writer, skipLevel + DEFAULT_SKIP_LEVEL)
 }
 
 // Wrapper for (*Logger).Close (closes and removes all logwriters)

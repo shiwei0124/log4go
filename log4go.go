@@ -180,8 +180,8 @@ func (log Logger) Close() {
 // Add a new LogWriter to the Logger which will only log messages at lvl or
 // higher.  This function should not be called from multiple goroutines.
 // Returns the logger for chaining.
-func (log Logger) AddFilter(name string, lvl Level, writer LogWriter) Logger {
-	log[name] = &Filter{lvl, writer, DEFAULT_SKIP_LEVEL}
+func (log Logger) AddFilter(name string, lvl Level, writer LogWriter, skipLevel int) Logger {
+	log[name] = &Filter{lvl, writer, skipLevel + DEFAULT_SKIP_LEVEL}
 	return log
 }
 
@@ -243,7 +243,6 @@ func (log Logger) intLogc(lvl Level, closure func() string) {
 
 	// Determine if any logging will be done
 	for _, filt := range log {
-		fmt.Printf("#################file.skip level : %d", filt.SkipLevel)
 		if skipLevel <= filt.SkipLevel {
 			skipLevel = filt.SkipLevel
 		}
@@ -257,7 +256,6 @@ func (log Logger) intLogc(lvl Level, closure func() string) {
 	}
 
 	// Determine caller func
-	fmt.Printf("!!!!!!!!!!!!!!!%d", skipLevel)
 	pc, _, lineno, ok := runtime.Caller(skipLevel)
 	src := ""
 	if ok {
