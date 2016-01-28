@@ -159,7 +159,6 @@ func NewConsoleLogger(lvl Level) Logger {
 // Create a new logger with a "stdout" filter configured to send log messages at
 // or above lvl to standard output.
 func NewDefaultLogger(lvl Level, skipLevel int) Logger {
-	fmt.Printf("$$$$$$$$$$$skiplevel: %d.", skipLevel)
 	return Logger{
 		"stdout": &Filter{lvl, NewConsoleLogWriter(),skipLevel + DEFAULT_SKIP_LEVEL},
 	}
@@ -192,7 +191,6 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 	skipLevel := DEFAULT_SKIP_LEVEL 
 	// Determine if any logging will be done
 	for _, filt := range log {
-		fmt.Printf("#################file.skip level : %d", filt.SkipLevel)
 		if skipLevel <= filt.SkipLevel {
 			skipLevel = filt.SkipLevel
 		}
@@ -207,7 +205,6 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 
 	// Determine caller func
 	// modify by shiwei: 修改层级为3以适应yzlog
-	fmt.Printf("!!!!!!!!!!!!!!!%d", skipLevel)
 	pc, _, lineno, ok := runtime.Caller(skipLevel)
 	src := ""
 	if ok {
