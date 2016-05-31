@@ -84,7 +84,7 @@ const (
 
 // Logging level strings
 var (
-	levelStrings = [...]string{"FNST", "FINE", "DEBG", "TRAC", "INFO", "WARN", "EROR", "CRIT"}
+	levelStrings = [...]string{"FNST", "FINE", "DEBG", "TRAC", "INFO", "WARN", "ERROR", "CRIT"}
 )
 
 func (l Level) String() string {
@@ -160,7 +160,7 @@ func NewConsoleLogger(lvl Level) Logger {
 // or above lvl to standard output.
 func NewDefaultLogger(lvl Level, skipLevel int) Logger {
 	return Logger{
-		"stdout": &Filter{lvl, NewConsoleLogWriter(),skipLevel + DEFAULT_SKIP_LEVEL},
+		"stdout": &Filter{lvl, NewConsoleLogWriter(), skipLevel + DEFAULT_SKIP_LEVEL},
 	}
 }
 
@@ -188,7 +188,7 @@ func (log Logger) AddFilter(name string, lvl Level, writer LogWriter, skipLevel 
 // Send a formatted log message internally
 func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 	skip := true
-	skipLevel := DEFAULT_SKIP_LEVEL 
+	skipLevel := DEFAULT_SKIP_LEVEL
 	// Determine if any logging will be done
 	for _, filt := range log {
 		if skipLevel <= filt.SkipLevel {
@@ -236,7 +236,7 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 // Send a closure log message internally
 func (log Logger) intLogc(lvl Level, closure func() string) {
 	skip := true
-	skipLevel := DEFAULT_SKIP_LEVEL 
+	skipLevel := DEFAULT_SKIP_LEVEL
 
 	// Determine if any logging will be done
 	for _, filt := range log {
